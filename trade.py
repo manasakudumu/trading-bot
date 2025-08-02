@@ -1,6 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from fetch_data import fetch_intraday
+from strategies.sma_crossover import sma_crossover_strategy
+from strategies.ema_crossover import ema_crossover_strategy
+
 
 #indicators
 def calculate_sma(data, window=20):
@@ -141,20 +144,23 @@ def plot_rsi(data):
 def main():
     symbol = "MSFT"
     df = fetch_intraday(symbol)
-    if df is not None:
-        df = calculate_sma(df)
-        df = calculate_rsi(df)
-        buy, sell = get_crossover_signals(df)
-        print(f"buy signals: {len(buy)} | sell signals: {len(sell)}")
-        trades, portfolio_values = portfolio(df, buy, sell)
-        for entry in trades:
-            print(entry)
-        evaluate_portfolio(trades, portfolio_values, initial_balance=10000)
-        plot_sma(df, symbol=symbol, buy=buy, sell=sell)
-        plot_portfolio(portfolio_values)
-        plot_rsi(df)
-    else:
-        print("couldn't fetch data.")
+    if df is None:
+        print("Couldn't fetch data.")
+        return
+    df = calculate_sma(df)
+    df = calculate_rsi(df)
+    df = calculate_ema(df)
+    # choose a strat:
+    # buy, sell = sma_crossover_strategy(df)
+    buy, sell = ema_crossover_strategy(df)
+    print(f"buy signals: {len(buy)} | sell signals: {len(sell)}")
+    trades, portfolio_values = portfolio(df, buy, sell)
+    for entry in trades:
+        print(entry)
+    evaluate_portfolio(trades, portfolio_values, initial_balance=10000)
+    plot_sma(df, symbol=symbol, buy=buy, sell=sell)
+    plot_portfolio(portfolio_values)
+    plot_rsi(df)
 
 
 if __name__ == "__main__":
