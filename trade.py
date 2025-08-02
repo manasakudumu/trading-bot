@@ -24,6 +24,11 @@ def calculate_sharpe(portfolio_values):
     sharpe_ratio = (avg_return /std_return) * (252*6) ** 0.5
     return sharpe_ratio
 
+def calculate_ema(data, short_window=20, long_window=50):
+    data['EMA_short'] = data['4. close'].ewm(span = short_window, adjust=False).mean()
+    data['EMA_long'] = data['4. close'].ewm(span = long_window, adjust=False).mean()
+    return data
+
 # strat
 def get_crossover_signals(data):
     buy = []
